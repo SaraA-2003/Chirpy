@@ -17,13 +17,13 @@ export async function handlerPrintFileserverHits(req: Request, res:Response): Pr
     await res.type("text/html; charset=utf-8").send(`<html>
   <body>
     <h1>Welcome, Chirpy Admin</h1>
-    <p>Chirpy has been visited ${config.fileserverHits} times!</p>
+    <p>Chirpy has been visited ${config.api.fileserverHits} times!</p>
   </body>
 </html>`);
 }
 
 export async function handlerReset(req: Request, res:Response): Promise<void>{
-        config.fileserverHits =0;
+        config.api.fileserverHits =0;
         //Always send a response
         res.send();
 
