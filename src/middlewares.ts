@@ -1,6 +1,7 @@
 
 import { Request, Response, NextFunction } from "express";
 import { config } from "./config.js";
+import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError } from "./customErrors.js";
 
 //---------------------------------------------------------------
 
@@ -42,6 +43,17 @@ export function middlewareParseJson(req: Request, res: Response, next: NextFunct
 }
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
-    console.error("Something went wrong on our end");
-    res.status(500).json({ error: "Something went wrong on our end"});
+    if (err instanceof BadRequestError) {
+        res.status(400).json({ error: err.message });
+    } else if (err instanceof UnauthorizedError) {
+        res.status(401).json({ error: err.message });
+    } else if (err instanceof ForbiddenError) {
+        res.status(403).json({ error: err.message });
+    } else if (err instanceof NotFoundError) {
+        res.status(404).json({ error: err.message });
+    }
+    else {
+        console.error("Something went wrong on our end");
+        res.status(500).json({ error: "Something went wrong on our end"});
+    }
 }

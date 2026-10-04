@@ -30,33 +30,21 @@ export async function handlerReset(req: Request, res:Response): Promise<void>{
 }
 
 export async function handlerValidateChirp(req: Request, res:Response): Promise<void>{
-    res.header("Content-Type", "application/json");
     if(!req.body ){
-      const error : ResponseErrorBody = { error: "Missing request body" };
-      const body = JSON.stringify(error);
-      res.status(400).send(body);
-      return;
+      throw new BadRequestError("Missing request body");
     }
     if(typeof req.body !== "object"){
-      const error : ResponseErrorBody = { error: "Request body must be a JSON object" };
-      const body = JSON.stringify(error);
-      res.status(400).send(body);
-      return;
+      throw new BadRequestError("Request body must be a JSON object");
     }
     if(!("body" in req.body)){
-      const error : ResponseErrorBody = { error: "Missing 'body' field in request body" };
-      const body = JSON.stringify(error);
-      res.status(400).send(body);
-      return;
+      throw new BadRequestError("Missing 'body' field in request body");
     }
+    
     if(typeof req.body.body !== "string"){
-      const error : ResponseErrorBody = { error: "'body' field must be a string" };
-      const body = JSON.stringify(error);
-      res.status(400).send(body);
-      return;
+      throw new BadRequestError("'body' field must be a string");
     }
     if(req.body.body.length > 140){
-      throw new Error("Chirp body exceeds 140 characters");
+      throw new BadRequestError("Chirp is too long. Max length is 140");
     }
 
     const chirpBody = req.body.body;
@@ -68,5 +56,6 @@ export async function handlerValidateChirp(req: Request, res:Response): Promise<
     }
   }
     const cleanedChirp : string= arrayChirp.join(" ");
+    res.header("Content-Type", "application/json");
     res.status(200).send(JSON.stringify({ cleanedBody: cleanedChirp}));
 }
