@@ -8,6 +8,34 @@
       "when": 1791119797594,
       "tag": "0000_lowly_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791131155444,
+      "tag": "0001_elite_rawhide_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791133595288,
+      "tag": "0002_updateColumnUserId_InChirpsTable",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791206001925,
+      "tag": "0003_Add_PasswordHashed_field_toUsers",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791225756789,
+      "tag": "0004_Add_RefreshToken_Table",
+      "breakpoints": true
     }
   ]
 }

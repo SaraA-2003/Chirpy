@@ -53,7 +53,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
         res.status(404).json({ error: err.message });
     }
     else {
-        console.error("Something went wrong on our end");
+        console.error(err);
         res.status(500).json({ error: "Something went wrong on our end"});
     }
 }

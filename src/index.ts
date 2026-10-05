@@ -1,5 +1,6 @@
 import express from "express"
-import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerValidateChirp } from "./handlers.js";
+import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerLogin, handlerRefresh, handlerRevoke, handlerUpdateUser } from "./handlers.js";
+import { handlerCreateUser, handlerCreateChirp , handlerGetChirps, handlerGetChirpById} from "./handlers.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./middlewares.js";
 import { config } from "./config.js";
 import postgres from "postgres";
@@ -20,7 +21,19 @@ app.use("/app", middlewareMetricsInc,express.static("./src/app"));
 app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerPrintFileserverHits);
 app.post("/admin/reset", handlerReset);
-app.post("/api/validate_chirp", handlerValidateChirp)
+app.post("/api/chirps", handlerCreateChirp);
+app.get("/api/chirps", handlerGetChirps);
+app.get("/api/chirps/:chirpId",handlerGetChirpById);
+app.post("/api/users", handlerCreateUser);
+app.post("/api/login", handlerLogin);
+app.post("/api/refresh", handlerRefresh);
+app.post("/api/revoke", handlerRevoke);
+app.put("/api/users", handlerUpdateUser);
+
+
+
+
+
 
 // Error handling middleware
 app.use(errorHandler);

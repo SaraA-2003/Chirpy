@@ -15,6 +15,9 @@ type DBConfig = {
 type APIConfig = {
   fileserverHits: number;
   PORT: number;
+  PLATFORM: string;
+  SECRET: string;
+
 };
 type Config = {
   api: APIConfig;
@@ -25,12 +28,14 @@ type Config = {
 export const config : Config ={
     api:{
       fileserverHits: 0,
-      PORT: parseInt(envOrThrow("PORT"), 10)
+      PORT: parseInt(envOrThrow("PORT"), 10),
+      PLATFORM: envOrThrow("PLATFORM"),
+      SECRET: envOrThrow("SECRET"),
     },
 
     db:{
       url: envOrThrow("DB_URL"),
-      migrationConfig: migrationConfig
+      migrationConfig: migrationConfig,
     }
 };
 
@@ -42,6 +47,5 @@ export function envOrThrow(key: string): string {
     if (!value) {
         throw new Error(`Missing environment variable: ${key}`);
     }
-
     return value;
 }
