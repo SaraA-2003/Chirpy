@@ -2,7 +2,7 @@ import { Request,Response, NextFunction } from "express";
 import { config } from "./config.js";
 import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError } from "./customErrors.js";
 import {createUser, deleteUsers, getUserByEmail, updateUser} from "./db/queries/users.js";
-import { createChirp, getChirps , getChirpById} from "./db/queries/chirps.js";
+import { createChirp, getChirps , getChirpById, deleteChirpById} from "./db/queries/chirps.js";
 import { hashPassword, checkPasswordHash, makeJWT, getBearerToken, validateJWT, makeRefreshToken} from "./auth.js";
 import { UserResponse } from "./db/schema.js";
 import { createRefreshToken, getRefreshTokenByToken, UpdateRefreshToken } from "./db/queries/refresh_tokens.js";
@@ -153,10 +153,32 @@ export async function handlerGetChirpById(req: Request, res:Response): Promise<v
     console.log(chirpRecord)
 
   if(!chirpRecord){
-    throw new NotFoundError(`User with id : ${chirpId} not found!`)
+    throw new NotFoundError(`Chirp with id : ${chirpId} not found!`)
   }
   res.status(200).json(chirpRecord);
 }
+
+export async function handlerDeleteChirpById(req: Request, res:Response): Promise<void>{
+    const accessToken = getBearerToken(req);
+    const userId = validateJWT(accessToken, config.api.SECRET);
+    const chirpId = req.params.chirpId;
+    if (typeof chirpId !== "string") {
+      throw new BadRequestError("Invalid chirp ID");
+    }
+     const chirpRecord = await getChirpById(chirpId); 
+    console.log(chirpRecord)
+
+  if(!chirpRecord){
+    throw new NotFoundError(`Chirp with id : ${chirpId} not found!`)
+  }
+  if(userId != chirpRecord.userId ){
+    throw new ForbiddenError("You do not have permission to delete this chirp")
+  }
+
+  await deleteChirpById(chirpId);
+  res.status(204).send();
+}
+
 
 
 

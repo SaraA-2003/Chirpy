@@ -1,5 +1,5 @@
 import express from "express"
-import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerLogin, handlerRefresh, handlerRevoke, handlerUpdateUser } from "./handlers.js";
+import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerLogin, handlerRefresh, handlerRevoke, handlerUpdateUser, handlerDeleteChirpById } from "./handlers.js";
 import { handlerCreateUser, handlerCreateChirp , handlerGetChirps, handlerGetChirpById} from "./handlers.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./middlewares.js";
 import { config } from "./config.js";
@@ -29,6 +29,7 @@ app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
 app.put("/api/users", handlerUpdateUser);
+app.delete("/api/chirps/:chirpId",handlerDeleteChirpById)
 
 
 
