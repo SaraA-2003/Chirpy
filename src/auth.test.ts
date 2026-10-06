@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { makeJWT, validateJWT } from "./auth.js"
+import { getAPIKey, makeJWT, validateJWT } from "./auth.js"
 import { hashPassword, checkPasswordHash } from "./auth.js";
 import { Request } from "express";
 import { getBearerToken } from "./auth.js";
@@ -76,4 +76,27 @@ it("should throw if Authorization header is missing", () => {
 
     expect(() => getBearerToken(req)).toThrow();
     });
+
+    it("should return the apikey token", () => {
+    const req = {
+        get: (header: string) => {
+            if (header === "Authorization") {
+                return "ApiKey abc123";
+            }
+            return undefined;
+        },
+    } as Request;
+
+    const result = getAPIKey(req);
+
+    expect(result).toBe("abc123");
+});
+it("should throw if Authorization header is missing", () => {
+    const req = {
+        get: (header: string) => undefined,
+    } as Request;
+
+    expect(() => getAPIKey(req)).toThrow();
+    });
+
 });

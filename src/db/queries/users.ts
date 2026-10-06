@@ -22,9 +22,11 @@ export async function getUserByEmail(email:string){
 }
 
 export async function updateUser(userId: string,user:NewUser){
-  const [record] = await db.update(users).set({
-    hashedPassword: user.hashedPassword,
-    email: user.email
-  }).where(eq(users.id,userId)).returning();
+  const [record] = await db.update(users).set(user).where(eq(users.id,userId)).returning();
+  return record;
+}
+
+export async function updateUserChirpyRedUsingId(userId: string){
+  const [record] = await db.update(users).set({isChirpyRed:true}).where(eq(users.id,userId)).returning();
   return record;
 }

@@ -1,5 +1,5 @@
 import express from "express"
-import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerLogin, handlerRefresh, handlerRevoke, handlerUpdateUser, handlerDeleteChirpById } from "./handlers.js";
+import { handlerReadiness, handlerPrintFileserverHits, handlerReset, handlerLogin, handlerRefresh, handlerRevoke, handlerUpdateUser, handlerDeleteChirpById, handlerWebhooks } from "./handlers.js";
 import { handlerCreateUser, handlerCreateChirp , handlerGetChirps, handlerGetChirpById} from "./handlers.js";
 import { middlewareLogResponses, middlewareMetricsInc, errorHandler } from "./middlewares.js";
 import { config } from "./config.js";
@@ -18,18 +18,28 @@ app.use(express.json());
 // Use Express's built-in middleware to serve static files
 //app is url prefix
 app.use("/app", middlewareMetricsInc,express.static("./src/app"));
+
+//HTTP requests
+//GET
 app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerPrintFileserverHits);
+app.get("/api/chirps/", handlerGetChirps);
+app.get("/api/chirps/:chirpId",handlerGetChirpById);
+
+//POST
 app.post("/admin/reset", handlerReset);
 app.post("/api/chirps", handlerCreateChirp);
-app.get("/api/chirps", handlerGetChirps);
-app.get("/api/chirps/:chirpId",handlerGetChirpById);
 app.post("/api/users", handlerCreateUser);
 app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
+app.post("/api/polka/webhooks",handlerWebhooks);
+
+//PUT
 app.put("/api/users", handlerUpdateUser);
-app.delete("/api/chirps/:chirpId",handlerDeleteChirpById)
+
+//DELETE
+app.delete("/api/chirps/:chirpId",handlerDeleteChirpById);
 
 
 

@@ -51,3 +51,11 @@ export function makeRefreshToken():string{
     return refreshToken;
 }
 
+export function getAPIKey(req: Request): string{
+     const authorization = req.get("Authorization");
+    if(!authorization){
+        throw new UnauthorizedError("Missing Authorization header");
+    }
+    return authorization.replace("ApiKey","").trim();
+
+}

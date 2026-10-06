@@ -36,6 +36,13 @@
       "when": 1791225756789,
       "tag": "0004_Add_RefreshToken_Table",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791272747499,
+      "tag": "0005_Add_IsChirpyRed_Field_UserTable",
+      "breakpoints": true
     }
   ]
 }

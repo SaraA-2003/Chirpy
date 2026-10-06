@@ -1,12 +1,11 @@
 import { Request,Response, NextFunction } from "express";
 import { config } from "./config.js";
 import { NotFoundError, BadRequestError, UnauthorizedError, ForbiddenError } from "./customErrors.js";
-import {createUser, deleteUsers, getUserByEmail, updateUser} from "./db/queries/users.js";
-import { createChirp, getChirps , getChirpById, deleteChirpById} from "./db/queries/chirps.js";
-import { hashPassword, checkPasswordHash, makeJWT, getBearerToken, validateJWT, makeRefreshToken} from "./auth.js";
+import {createUser, deleteUsers, getUserByEmail, updateUser, updateUserChirpyRedUsingId} from "./db/queries/users.js";
+import { createChirp, getChirps , getChirpById, deleteChirpById, getChirpByUserId} from "./db/queries/chirps.js";
+import { hashPassword, checkPasswordHash, makeJWT, getBearerToken, validateJWT, makeRefreshToken, getAPIKey} from "./auth.js";
 import { UserResponse } from "./db/schema.js";
 import { createRefreshToken, getRefreshTokenByToken, UpdateRefreshToken } from "./db/queries/refresh_tokens.js";
-
 
 //Global
 const expireInt = 3600; //1h
@@ -140,8 +139,37 @@ export async function handlerCreateChirp(req: Request, res:Response): Promise<vo
     res.status(201).json(newChirp)
 }
 export async function handlerGetChirps(req: Request, res:Response): Promise<void>{
-  const chirps = await getChirps();
-  res.status(200).json(chirps);
+  let sort = "asc";
+  let sortQuery = req.query.sort;
+  if (typeof sortQuery === "string") {
+    sort = sortQuery;
+  }
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+  if(!authorId){
+    const chirps = await getChirps();
+    if(sort == "asc")
+    {
+      chirps.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    }
+    else{
+      chirps.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+    res.status(200).json(chirps);
+    return;
+  }
+  const chirpList = await getChirpByUserId(authorId);
+  if(sort == "asc")
+    {
+      chirpList.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    }
+    else{
+      chirpList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+  res.status(200).json(chirpList);
 }
 
 export async function handlerGetChirpById(req: Request, res:Response): Promise<void>{
@@ -178,6 +206,44 @@ export async function handlerDeleteChirpById(req: Request, res:Response): Promis
   await deleteChirpById(chirpId);
   res.status(204).send();
 }
+
+//-------------------------------Webhook---------------------------------------
+export async function handlerWebhooks(req: Request, res:Response): Promise<void>{
+  const apiKey = getAPIKey(req);
+  if(apiKey != config.api.POLKA_KEY){
+    throw new UnauthorizedError("Invalid API Key");
+  }
+  validateRequestBody(req);
+  if(!("event" in req.body)){
+    throw new BadRequestError("Missing 'event' field in request body");
+  }
+  if(typeof req.body.event !== "string"){
+    throw new BadRequestError("'event' field must be a string");
+  }
+  if(!("data" in req.body)){
+    throw new BadRequestError("Missing 'data' field in request body");
+  }
+    if(typeof req.body.data !== "object"){
+    throw new BadRequestError("'data' field must be an object");
+  }
+  if(!("userId" in req.body.data)){
+    throw new BadRequestError("Missing 'userId' field inside data field");
+  }
+  if(typeof req.body.data.userId !== "string"){
+    throw new BadRequestError("'userId' field must be a string");
+  }
+
+  if(req.body.event != "user.upgraded"){
+    res.status(204).send();
+    return;
+  }
+  const updatedUser = await updateUserChirpyRedUsingId(req.body.data.userId)
+  if(!updatedUser){
+    throw new NotFoundError("User not found!");
+  }
+  res.status(204).send();
+}
+
 
 
 

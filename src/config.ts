@@ -17,6 +17,7 @@ type APIConfig = {
   PORT: number;
   PLATFORM: string;
   SECRET: string;
+  POLKA_KEY: string;
 
 };
 type Config = {
@@ -31,6 +32,7 @@ export const config : Config ={
       PORT: parseInt(envOrThrow("PORT"), 10),
       PLATFORM: envOrThrow("PLATFORM"),
       SECRET: envOrThrow("SECRET"),
+      POLKA_KEY: envOrThrow("POLKA_KEY"),
     },
 
     db:{
